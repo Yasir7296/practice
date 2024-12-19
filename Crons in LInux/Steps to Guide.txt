@@ -1,0 +1,87 @@
+								Cron Job: Logs system uptime every 2 minutes
+
+1)  Command: systemctl status cron
+    Purpose: Checks the status of the cron service.
+
+2)  Command: crontab -e
+    Purpose: Edits the crontab file to set or modify scheduled tasks.
+
+3)  Command: */2 * * * * uptime >> /var/log/uptime.log
+    Purpose: Logs the system uptime every 2 minutes to /var/log/uptime.log.
+
+4)  Command: crontab -l
+    Purpose: Lists all the currently scheduled cron jobs.
+
+5)  Command: ls /var/log/
+    Purpose: Lists the contents of the /var/log/ directory.
+
+6)  Command: cat /var/log/uptime.log
+    Purpose: Displays the contents of the uptime.log file in /var/log/.
+
+
+##########################################################################################
+
+						Cron Job: Pulls the latest changes from the GitHub repository every 2 minutes
+
+
+1) Command: ls
+   Purpose: Lists the contents of the current directory.
+
+2) Command: mkdir Git-Folder
+   Purpose: Creates a new directory named Git-Folder.
+
+3) Command: ls
+   Purpose: Lists the contents of the current directory after creating Git-Folder.
+
+4) Command: chmod 777 Git-Folder
+   Purpose: Grants read, write, and execute permissions to all users for the Git-Folder directory.
+
+5) Command: cd Git-Folder
+   Purpose: Changes the current directory to Git-Folder.
+
+6) Command: git clone https://github.com/Yasir7296/practice.git
+   Purpose: Clones the practice repository from GitHub into the Git-Folder.
+
+7) Command: ls
+   Purpose: Lists the contents of the Git-Folder after cloning the repository.
+
+8) Command: cd practice
+   Purpose: Changes the directory to the practice folder inside Git-Folder.
+
+9) Command: ls
+   Purpose: Lists the contents of the practice directory.
+
+10)Command: crontab -e
+   Purpose: Edits the crontab file to add or modify scheduled tasks.
+
+11)Command: */2 * * * * cd /home/vboxuser/Git-Folder/practice && git pull origin main
+   Purpose: Sets a cron job to pull the latest changes from the GitHub repository every 2 minutes.
+
+12)Command: ctrl+x then y
+   Purpose: Saves and exits the crontab editor.
+
+13)Command: crontab -l
+   Purpose: Lists all the currently scheduled cron jobs.
+
+Next Steps: After making changes to the GitHub repository, the cron job
+ will automatically pull the changes to your local machine every 2 minutes.
+
+
+###################################################################################################
+
+								Cron Job: Logs system memory usage every minute
+
+1) Command: crontab -e
+   Purpose: Edits the crontab file to add or modify scheduled tasks.
+
+2) Command: */1 * * * * free -m >> /var/log/memory_usage.log
+   Purpose: Sets a cron job to log the system's memory usage every minute to /var/log/memory_usage.log.
+
+3) Command: crontab -l
+   Purpose: Lists all the currently scheduled cron jobs.
+
+4) Command: ls /var/log
+   Purpose: Lists the contents of the /var/log directory to check if the log file exists.
+
+5) Command: cat /var/log/memory_usage.log
+   Purpose: Displays the contents of the memory_usage.log file located in /var/log/.
