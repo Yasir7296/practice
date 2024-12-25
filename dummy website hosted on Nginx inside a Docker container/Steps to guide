@@ -1,0 +1,9 @@
+docker build -t ubuntu-nginx-dummy .
+
+docker images
+
+docker run -d -p 8080:80 --name dummy-nginx ubuntu-nginx-dummy
+
+docker ps
+
+http://localhost:8080/
