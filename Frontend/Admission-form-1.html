@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>User Dashboard</title>
+  <!-- Font Awesome Link for Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link rel="stylesheet" href="style.css">
+
+<body>
+  <div class="sidebar">
+  <h2>GGSC USER</h2>
+    <a href="index.html"><span class="icon-box"><i class="fas fa-home"></i></span> Dashboard</a>
+    <a href="Admission-form.html"><span class="icon-box"><i class="fas fa-file-alt"></i></span> Admission Form</a>
+    <a href="Profile.html"><span class="icon-box"><i class="fas fa-user"></i></span> Profile</a>
+    <a href="Submit-Fees.html"><span class="icon-box"><i class="fas fa-dollar-sign"></i></span> Submit Fees</a>
+    <a href="Change-password.html"><span class="icon-box"><i class="fas fa-key"></i></span> Change Password</a>
+    <div class="logout-btn"><span class="icon-box"><i class="fas fa-sign-out-alt"></i></span> Logout</div>
+  </div>
+
+     <!-- Main Content -->
+<div class="main-content-form">
+        <div class="header">
+          <h3>User Dashboard</h3>
+        </div>
+        <div class="title">
+          <h2>Admission Form</h2>
+        </div>
+
+    <div class="card-form">
+        <div class="form-row">
+            <div class="form-group">
+              <label>Course Applied:</label>
+              <select>
+                  <option value="bsit">BSIT</option>
+                  <option value="bscs">BSCS</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+                <label for="imageUpload">Student Photo:</label>
+                <input type="file" id="imageUpload" accept="image/*" required>
+            </div>
+        </div>
+            
+      <h2>Basic Details</h2>
+
+      <div class="form-row"> 
+        <div class="form-group">
+            <label>Name of Candidate:</label>
+            <input type="text" placeholder="Full name" required>
+        </div>
+
+        <div class="form-group">
+            <label>Phone Number:</label>
+            <input type="text" placeholder="e.g., 03XX-XXXXXXX" required>
+        </div>
+      </div>
+
+      <div class="form-row"> 
+        <div class="form-group">
+            <label>Father's Name:</label>
+            <input type="text" placeholder="Full name">
+        </div>
+
+        <div class="form-group">
+            <label>Phone Number:</label>
+            <input type="text" placeholder="e.g., 03XX-XXXXXXX">
+        </div>
+      </div>
+
+      <div class="form-row"> 
+        <div class="form-group">
+            <label>Candidate's CNIC</label>
+            <input type="text" placeholder="35202-XXXXXXX-X">
+        </div>
+
+        <div class="form-group">
+            <label>Religion</label>
+            <select>    
+                <option value="Islam">Islam</option>
+                <option value="Christian">Christian</option>
+                <option value="Other">Other</option>
+            </select>
+        </div>
+      </div>
+
+      <div class="form-row"> 
+        <div class="form-group">
+            <label>Date of Birth:</label>
+            <input type="date">
+        </div>
+    
+        <div class="form-group">
+            <label>Email:</label>
+            <input type="email" placeholder="example@email.com">
+        </div>
+      </div>
+
+      <div class="form-row"> 
+        <div class="form-group">
+            <label>Father's Occupation:</label>
+            <input type="text" placeholder="e.g., Teacher, Engineer">
+        </div>
+    
+        <div class="form-group">
+            <label>Father's CNIC No:</label>
+            <input type="text" placeholder="35202-XXXXXXX-X">
+        </div>
+      </div>
+
+      <div class="form-row"> 
+        <div class="form-group">
+            <label>Guardian's Name:</label>
+            <input type="text" placeholder="Guardian's full name">
+        </div>
+
+        <div class="form-group">
+            <label>Guardian's Phone No:</label>
+            <input type="text" placeholder="e.g., 03XX-XXXXXXX">
+        </div>
+      </div>
+
+      <div class="form-row"> 
+        <div class="form-group">
+            <label>Present Address</label>
+            <input type="text" placeholder="House No, Street, City">
+        </div>
+      </div>
+
+      <div class="form-row"> 
+        <div class="form-group">
+            <label>Permanent Address</label>
+            <input type="text" placeholder="House No, Street, City">
+        </div>
+      </div>
+    </div>
+        
+       <div class="content">
+          <div class="card-1">
+              <h2>Education Information</h2>
+         
+            <table>
+              <tr>
+                  <th>Examination</th>
+                  <th>Year</th>
+                  <th>Roll No</th>
+                  <th>Marks</th>
+                  <th>%age</th>
+                  <th>Subjects</th>
+                  <th>From where passed</th>
+              </tr>
+              <tr>
+                  <td>Matric (Arts/Science)</td>
+                  <td><input type="number" placeholder="Year" required></td>
+                  <td><input type="text" placeholder="Roll No" required></td>
+                  <td><input type="number" placeholder="Marks" required></td>
+                  <td><input type="number" placeholder="%age" required></td>
+                  <td><input type="text" placeholder="Subjects" required></td>
+                  <td><input type="text" placeholder="School/Board" required></td>
+              </tr>
+              <tr>
+                  <td>Intermediate (Arts/Science)</td>
+                  <td><input type="number" placeholder="Year" required></td>
+                  <td><input type="text" placeholder="Roll No" required></td>
+                  <td><input type="number" placeholder="Marks" required></td>
+                  <td><input type="number" placeholder="%age" required></td>
+                  <td><input type="text" placeholder="Subjects" required></td>
+                  <td><input type="text" placeholder="School/Board" required></td>
+              </tr>
+              <tr>
+                  <td>Associate Degree (Arts/Science)</td>
+                  <td><input type="number" placeholder="Year" required></td>
+                  <td><input type="text" placeholder="Roll No" required></td>
+                  <td><input type="number" placeholder="Marks" required></td>
+                  <td><input type="number" placeholder="%age" required></td>
+                  <td><input type="text" placeholder="Subjects" required></td>
+                  <td><input type="text" placeholder="School/Board" required></td>
+              </tr>
+          </table>
+      </div>
+    </div>
+    
+    <div class="terms-container">
+      
+        <h2>Terms & Conditions</h2>
+      
+      <div class="terms-box">
+        <h3>From the Candidate:</h3>
+          <p>1. I undertake that I am applying tor admission with the
+            consent of my parents/guardian.</p>
+          <p>2. 1 also undertake that I was not admitted to any other
+            college/university in Intermediate/BS Post-graduate
+            class in the previous year. If proved otherwise at any
+            stage, the college authorities reserve the right to cancel
+            my admission to this college and forfeit all my dues. I
+            further undertake that I have read all the rules and
+            regulations in the prospectus relating to examination and
+            admission to this college and shall abide by them.</p>
+          <p>3. I also undertake that: (i) I have never been rusticated nor
+            expelled from any institution, (ii) I have never taken part
+            in any illegal activity in any institution nor has any
+            disciplinary action ever been taken against me.</p>
+          <p>4. I undertake that I am not employed full or part time
+            anywhere at the time of my classes in this college.</p>
+          <p>5. I undertake that I will not join any political organization
+            during my stay in this college. If I do so. the college
+            authorities reserve the right to cancel my admission.</p>
+            <br>
+            <h3>From the Parents/Guardian:</h3>
+            <p>6, I. the parents/guardian, undertake that I shall be
+              responsible for the payment of college fee and all other
+              dues of my son/daughter and shall indemnify for all the
+              losses to the college due to his/her lapses.</p>
+              <p>7, I. the parents/guardian, also undertake that my
+                son/daughter shall not take part in any political activity.
+                Moreover, if. at any stage, the documents submitted by
+                him/her are proved fake, forged or bogus, the college
+                authorities reserve the right to cancel his/her admission
+                and take necessary action accordingly.</p>
+      </div>
+  
+      <div class="terms-footer">
+          <label>
+              <input type="checkbox" id="agreeCheckbox"> I agree to the Terms & Conditions
+          </label>
+          <button id="submitButton" disabled>Submit</button>
+      </div>
+  </div>
+  
+
+<script>
+  const checkbox = document.getElementById("agreeCheckbox");
+  const submitButton = document.getElementById("submitButton");
+
+  checkbox.addEventListener("change", function() {
+      submitButton.disabled = !this.checked;
+  });
+</script>
+</div>
+  
+</body>
+</html>
