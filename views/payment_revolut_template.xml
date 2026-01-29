@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <!-- Template for redirecting to Revolut's hosted payment page -->
+    <template id="redirect_form">
+        <!--
+            This form performs a GET request to the Revolut `checkout_url` (api_url).
+            The URL is dynamically generated for each transaction and may include optional query parameters.
+        -->
+        <form t-att-action="api_url" method="get">
+            <!-- Inject each query parameter as a hidden input field -->
+            <t t-foreach="url_params" t-as="param">
+                <input
+                    type="hidden"
+                    t-att-name="param"
+                    t-att-value="url_params[param]"
+                />
+            </t>
+        </form>
+    </template>
+</odoo>

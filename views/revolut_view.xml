@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo>
+    <!-- Inherit the generic payment provider form to add Revolut-specific configuration -->
+    <record id="provider_form_revolut_payments" model="ir.ui.view">
+        <field name="name">provider.form.revolut.payments</field>
+        <field name="model">payment.provider</field>
+        <field name="inherit_id" ref="payment.payment_provider_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//form" position="inside">
+                <field name="code" invisible="1" />
+                <field name="state" invisible="1" />
+                <field name="company_id" invisible="1" />
+                <field name="module_to_buy" invisible="1" />
+                <field name="module_state" invisible="1" />
+                <field name="module_id" invisible="1" />
+                <field name="support_tokenization" invisible="1" />
+                <field name="support_manual_capture" invisible="1" />
+                <field name="support_express_checkout" invisible="1" />
+            </xpath>
+
+            <xpath expr="//group[@name='provider_credentials']" position="inside">
+                <!-- Required for inherited view to validate modifier -->
+                <field name="module_id" invisible="1" />
+                <field name="module_state" invisible="1" />
+
+                <group invisible="code != 'revolut' or state == 'disabled'">
+                    <field
+                        name="revolut_authentication_key"
+                        password="True"
+                        required="[
+                ('provider', '=', 'revolut'),
+                ('state', '!=', 'disabled')
+            ]"
+                    />
+                </group>
+            </xpath>
+
+        </field>
+    </record>
+</odoo>

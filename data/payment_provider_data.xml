@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<odoo noupdate="1">
+
+        <!--
+            Payment Method: Revolut
+            Defines the Revolut method in `payment.method` for use with the provider.
+        -->
+        <record id="payment_method_revolut" model="payment.method">
+            <field name="name">Revolut</field>
+            <field name="code">revolut</field>
+            <field name="sequence">10</field>
+            <field
+            name="image"
+            type="base64"
+            file="payment_revolut/static/description/icon.png"
+        />
+            <field name="support_tokenization">False</field>
+            <field name="support_express_checkout">False</field>
+        </record>
+
+        <!--
+            Account Payment Method: Revolut
+            Enables Revolut in `account.payment.method` for use in accounting/finance flows.
+        -->
+        <record id="account_payment_method_revolut" model="account.payment.method">
+            <field name="name">Revolut</field>
+            <field name="code">revolut</field>
+            <field name="payment_type">inbound</field>
+        </record>
+
+        <!--
+            Payment Provider: Revolut
+            Registers Revolut as a payment provider in the system with logo and redirect logic.
+        -->
+        <record id="payment_provider_revolut" model="payment.provider">
+            <field name="name">Revolut</field>
+            <field name="code">revolut</field>
+            <field
+            name="image_128"
+            type="base64"
+            file="payment_revolut/static/description/icon.png"
+        />
+            <field name="redirect_form_view_id" ref="redirect_form" />
+            <field
+            name="payment_method_ids"
+            eval="[Command.set([ref('payment_revolut.payment_method_revolut')])]"
+        />
+            <field name="support_tokenization">False</field>
+            <field name="allow_tokenization">False</field>
+            <field name="module_id" ref="base.module_payment_revolut"/>
+        </record>
+
+</odoo>
