@@ -1,0 +1,62 @@
+# Combined Deployment Workflow - Simple Version
+# This handles both staging and production deployments
+
+name: Deploy Odoo
+
+on:
+  push:
+    branches:
+      - staging  # Runs when you push to staging
+      - prod     # Runs when you push to prod
+
+jobs:
+  deploy:
+    name: Deploy to Server
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 🎯 Determine Deployment Environment
+        id: env
+        run: |
+          if [[ "${{ github.ref }}" == "refs/heads/staging" ]]; then
+            echo "environment=staging" >> $GITHUB_OUTPUT
+            echo "path=/home/ubuntu/Staging/stag/practice" >> $GITHUB_OUTPUT
+            echo "container=staging" >> $GITHUB_OUTPUT
+          else
+            echo "environment=production" >> $GITHUB_OUTPUT
+            echo "path=/home/ubuntu/Production/prod/practice" >> $GITHUB_OUTPUT
+            echo "container=production" >> $GITHUB_OUTPUT
+          fi
+      
+      - name: 🚀 Starting Deployment
+        run: |
+          echo "Deploying to ${{ steps.env.outputs.environment }} environment..."
+      
+      - name: 🔑 Setup SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ secrets.SERVER_IP }} >> ~/.ssh/known_hosts
+      
+      - name: 📥 Deploy Code
+        run: |
+          ssh ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
+            cd ${{ steps.env.outputs.path }}
+            git fetch origin
+            git checkout ${{ github.ref_name }}
+            git pull origin ${{ github.ref_name }}
+            echo "✅ Code updated!"
+          EOF
+      
+      - name: 🔄 Restart Container
+        run: |
+          ssh ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
+            # Restart the appropriate container
+            docker restart ${{ steps.env.outputs.container }}-odoo || \
+            cd /home/ubuntu/${{ steps.env.outputs.environment == 'staging' && 'Staging' || 'Production' }} && docker-compose restart
+            echo "✅ Container restarted!"
+          EOF
+      
+      - name: 🎉 Deployment Complete
+        run: echo "${{ steps.env.outputs.environment }} deployment completed!"

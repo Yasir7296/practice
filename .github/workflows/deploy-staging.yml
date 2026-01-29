@@ -1,0 +1,66 @@
+# This action runs when you push code to the 'staging' branch
+# Think of it as: "When staging branch gets new code, update the staging server"
+
+name: Deploy to Staging Server
+
+# When should this robot wake up and do work?
+on:
+  push:
+    branches:
+      - staging  # Only run when pushing to staging branch
+
+jobs:
+  deploy-staging:
+    name: Deploy to Staging
+    runs-on: ubuntu-latest  # The robot uses Ubuntu computer
+    
+    steps:
+      # Step 1: Tell the robot what we're doing
+      - name: 🚀 Starting Staging Deployment
+        run: echo "Deploying to staging server..."
+      
+      # Step 2: Give the robot the SSH key to connect to your server
+      - name: 🔑 Setup SSH Key
+        run: |
+          # Create a hidden .ssh folder (like a secret drawer)
+          mkdir -p ~/.ssh
+          
+          # Put the SSH key in a file
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          
+          # Make the key private (only you can read it)
+          chmod 600 ~/.ssh/id_rsa
+          
+          # Add server to known hosts (trust the server)
+          ssh-keyscan -H ${{ secrets.SERVER_IP }} >> ~/.ssh/known_hosts
+      
+      # Step 3: Connect to server and pull staging code
+      - name: 📥 Pull Staging Code on Server
+        run: |
+          ssh ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
+            # Go to staging folder
+            cd /home/ubuntu/Staging/stag/practice
+            
+            # Pull the latest staging code
+            git fetch origin
+            git checkout staging
+            git pull origin staging
+            
+            echo "✅ Staging code updated successfully!"
+          EOF
+      
+      # Step 4: Restart the staging container
+      - name: 🔄 Restart Staging Container
+        run: |
+          ssh ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
+            # Find the staging container name and restart it
+            # Replace 'staging-odoo' with your actual container name
+            cd /home/ubuntu/Staging
+            docker-compose restart || docker restart staging-odoo
+            
+            echo "✅ Staging container restarted!"
+          EOF
+      
+      # Step 5: Celebrate!
+      - name: 🎉 Deployment Complete
+        run: echo "Staging deployment completed successfully!"
