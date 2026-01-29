@@ -11,7 +11,7 @@ on:
 
 jobs:
   deploy-staging:
-    name: Deploy to Staging
+    name: Deploy to Staging addons
     runs-on: ubuntu-latest  # The robot uses Ubuntu computer
     
     steps:
