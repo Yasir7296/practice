@@ -27,6 +27,7 @@
                     <field
                         name="revolut_authentication_key"
                         password="True"
+                        string = "Hello how are you"
                         required="[
                 ('provider', '=', 'revolut'),
                 ('state', '!=', 'disabled')
