@@ -37,7 +37,7 @@ jobs:
             HostName ${{ secrets.SERVER_IP }}
             User ${{ secrets.SERVER_USER }}
             IdentityFile ~/.ssh/id_rsa
-            StrictHostKeyChecking no
+            IdentitiesOnly=yes
           SSHCONFIG
       
       # Test SSH connection first
