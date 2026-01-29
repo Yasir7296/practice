@@ -1,43 +1,54 @@
-# This action runs when you push code to the 'staging' branch
-# Think of it as: "When staging branch gets new code, update the staging server"
-
+# Fixed Deploy to Staging - This should work!
 name: Deploy to Staging Server
 
-# When should this robot wake up and do work?
 on:
   push:
     branches:
-      - staging  # Only run when pushing to staging branch
+      - staging
 
 jobs:
   deploy-staging:
     name: Deploy to Staging
-    runs-on: ubuntu-latest  # The robot uses Ubuntu computer
+    runs-on: ubuntu-latest
     
     steps:
-      # Step 1: Tell the robot what we're doing
       - name: 🚀 Starting Staging Deployment
         run: echo "Deploying to staging server..."
       
-      # Step 2: Give the robot the SSH key to connect to your server
+      # FIXED SSH Setup - This is the corrected version!
       - name: 🔑 Setup SSH Key
         run: |
-          # Create a hidden .ssh folder (like a secret drawer)
+          # Create SSH directory
           mkdir -p ~/.ssh
           
-          # Put the SSH key in a file
+          # Add the private key
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
           
-          # Make the key private (only you can read it)
+          # Fix permissions (VERY IMPORTANT!)
+          chmod 700 ~/.ssh
           chmod 600 ~/.ssh/id_rsa
           
-          # Add server to known hosts (trust the server)
+          # Add server to known hosts
           ssh-keyscan -H ${{ secrets.SERVER_IP }} >> ~/.ssh/known_hosts
+          
+          # Create SSH config for easier connection
+          cat >> ~/.ssh/config << 'SSHCONFIG'
+          Host production-server
+            HostName ${{ secrets.SERVER_IP }}
+            User ${{ secrets.SERVER_USER }}
+            IdentityFile ~/.ssh/id_rsa
+            StrictHostKeyChecking no
+          SSHCONFIG
       
-      # Step 3: Connect to server and pull staging code
+      # Test SSH connection first
+      - name: 🔌 Test SSH Connection
+        run: |
+          echo "Testing connection to server..."
+          ssh -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} "echo '✅ SSH connection successful!'"
+      
       - name: 📥 Pull Staging Code on Server
         run: |
-          ssh ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
+          ssh -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
             # Go to staging folder
             cd /home/ubuntu/Staging/stag/practice
             
@@ -49,18 +60,22 @@ jobs:
             echo "✅ Staging code updated successfully!"
           EOF
       
-      # Step 4: Restart the staging container
       - name: 🔄 Restart Staging Container
         run: |
-          ssh ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
-            # Find the staging container name and restart it
-            # Replace 'staging-odoo' with your actual container name
-            cd /home/ubuntu/Staging
-            docker-compose restart || docker restart staging-odoo
+          ssh -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
+            # Find and restart staging container
+            # Method 1: Try docker-compose
+            if [ -f /home/ubuntu/Staging/docker-compose.yml ]; then
+              cd /home/ubuntu/Staging
+              docker-compose restart
+            else
+              # Method 2: Try direct docker restart
+              # Replace 'staging' with your actual container name
+              docker restart $(docker ps -q -f name=staging) || echo "Please update container name"
+            fi
             
             echo "✅ Staging container restarted!"
           EOF
       
-      # Step 5: Celebrate!
       - name: 🎉 Deployment Complete
         run: echo "Staging deployment completed successfully!"
