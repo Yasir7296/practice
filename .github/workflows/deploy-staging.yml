@@ -1,4 +1,4 @@
-# Fixed Deploy to Staging - This should work!
+# Deploy to Staging - AWS PEM Compatible
 name: Deploy to Staging Server
 
 on:
@@ -15,40 +15,43 @@ jobs:
       - name: 🚀 Starting Staging Deployment
         run: echo "Deploying to staging server..."
       
-      # FIXED SSH Setup - This is the corrected version!
-      - name: 🔑 Setup SSH Key
+      - name: 🔑 Setup SSH Key (AWS PEM)
         run: |
           # Create SSH directory
           mkdir -p ~/.ssh
           
-          # Add the private key
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          # Add the PEM key - ensuring proper line breaks
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/aws_key.pem
           
-          # Fix permissions (VERY IMPORTANT!)
-          chmod 700 ~/.ssh
-          chmod 600 ~/.ssh/id_rsa
+          # CRITICAL: Fix permissions for PEM file (AWS requires exactly 400 or 600)
+          chmod 600 ~/.ssh/aws_key.pem
           
           # Add server to known hosts
           ssh-keyscan -H ${{ secrets.SERVER_IP }} >> ~/.ssh/known_hosts
           
-          # Create SSH config for easier connection
-          cat >> ~/.ssh/config << 'SSHCONFIG'
-          Host production-server
-            HostName ${{ secrets.SERVER_IP }}
-            User ${{ secrets.SERVER_USER }}
-            IdentityFile ~/.ssh/id_rsa
-            IdentitiesOnly=yes
-          SSHCONFIG
+          # Verify key was written correctly
+          if [ ! -s ~/.ssh/aws_key.pem ]; then
+            echo "❌ Error: PEM key file is empty!"
+            exit 1
+          fi
+          
+          echo "✅ SSH key configured successfully"
       
-      # Test SSH connection first
       - name: 🔌 Test SSH Connection
         run: |
           echo "Testing connection to server..."
-          ssh -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} "echo '✅ SSH connection successful!'"
+          ssh -i ~/.ssh/aws_key.pem \
+              -o StrictHostKeyChecking=no \
+              -o UserKnownHostsFile=/dev/null \
+              ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} \
+              "echo '✅ SSH connection successful!'"
       
       - name: 📥 Pull Staging Code on Server
         run: |
-          ssh -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
+          ssh -i ~/.ssh/aws_key.pem \
+              -o StrictHostKeyChecking=no \
+              -o UserKnownHostsFile=/dev/null \
+              ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
             # Go to staging folder
             cd /home/ubuntu/Staging/stag/practice
             
@@ -62,7 +65,10 @@ jobs:
       
       - name: 🔄 Restart Staging Container
         run: |
-          ssh -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
+          ssh -i ~/.ssh/aws_key.pem \
+              -o StrictHostKeyChecking=no \
+              -o UserKnownHostsFile=/dev/null \
+              ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
             # Find and restart staging container
             # Method 1: Try docker-compose
             if [ -f /home/ubuntu/Staging/docker-compose.yml ]; then
@@ -70,12 +76,19 @@ jobs:
               docker-compose restart
             else
               # Method 2: Try direct docker restart
-              # Replace 'staging' with your actual container name
-              docker restart $(docker ps -q -f name=staging) || echo "Please update container name"
+              # Find container with 'staging' in name
+              CONTAINER=$(docker ps --filter "name=staging" --format "{{.Names}}" | head -1)
+              if [ -n "$CONTAINER" ]; then
+                echo "Restarting container: $CONTAINER"
+                docker restart $CONTAINER
+              else
+                echo "⚠️  No staging container found. Available containers:"
+                docker ps --format "table {{.Names}}\t{{.Status}}"
+              fi
             fi
             
-            echo "✅ Staging container restarted!"
+            echo "✅ Staging container restart attempted!"
           EOF
       
       - name: 🎉 Deployment Complete
-        run: echo "Staging deployment completed successfully!"
+        run: echo "✅ Staging deployment completed successfully!"
