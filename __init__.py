@@ -1,4 +1,4 @@
-from . import models
+from . import 
 from . import controllers
 from odoo.addons.payment import reset_payment_provider
 
@@ -14,4 +14,4 @@ def uninstall_hook(env):
     :param env: Odoo environment passed during module uninstall
     """
     reset_payment_provider(env, "revolut")
-this is a testing code 
+this is a testing code .............................
