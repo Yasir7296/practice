@@ -73,7 +73,7 @@ jobs:
             # Method 1: Try docker-compose
             if [ -f /home/ubuntu/Staging/docker-compose.yml ]; then
               cd /home/ubuntu/Staging
-              docker-compose restart
+              docker compose restart
             else
               # Method 2: Try direct docker restart
               # Find container with 'staging' in name
