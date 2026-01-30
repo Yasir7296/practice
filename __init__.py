@@ -17,3 +17,5 @@ Now the action will work
     """
     reset_payment_provider(env, "revolut")
 this is a testing code .............................
+-----------------
+github actions
