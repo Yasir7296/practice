@@ -12,7 +12,7 @@
                 <field name="company_id" invisible="1" />Hello How are you ? o chll pai
                 <field name="module_to_buy" invisible="1" />
                 <field name="module_state" invisible="1" />
-                <field name="module_id" invisible="1" />        O paii chll ja hun
+                <field name="module_id" invisible="1" />        O paii chll ja hun..................aj nai mittr
                 <field name="support_tokenization" invisible="1" />
                 <field name="support_manual_capture" invisible="1" />
                 <field name="support_express_checkout" invisible="1" />
