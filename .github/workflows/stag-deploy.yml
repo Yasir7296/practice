@@ -1,0 +1,94 @@
+# Deploy to Staging - AWS PEM Compatible
+name: Deploy to Staging Server
+
+on:
+  push:
+    branches:
+      - staging
+
+jobs:
+  deploy-staging:
+    name: Deploy to Staging
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 🚀 Starting Staging Deployment
+        run: echo "Deploying to staging server..."
+      
+      - name: 🔑 Setup SSH Key (AWS PEM)
+        run: |
+          # Create SSH directory
+          mkdir -p ~/.ssh
+          
+          # Add the PEM key - ensuring proper line breaks
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/aws_key.pem
+          
+          # CRITICAL: Fix permissions for PEM file (AWS requires exactly 400 or 600)
+          chmod 600 ~/.ssh/aws_key.pem
+          
+          # Add server to known hosts
+          ssh-keyscan -H ${{ secrets.SERVER_IP }} >> ~/.ssh/known_hosts
+          
+          # Verify key was written correctly
+          if [ ! -s ~/.ssh/aws_key.pem ]; then
+            echo "❌ Error: PEM key file is empty!"
+            exit 1
+          fi
+          
+          echo "✅ SSH key configured successfully"
+      
+      - name: 🔌 Test SSH Connection
+        run: |
+          echo "Testing connection to server..."
+          ssh -i ~/.ssh/aws_key.pem \
+              -o StrictHostKeyChecking=no \
+              -o UserKnownHostsFile=/dev/null \
+              ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} \
+              "echo '✅ SSH connection successful!'"
+      
+      - name: 📥 Pull Staging Code on Server
+        run: |
+          ssh -i ~/.ssh/aws_key.pem \
+              -o StrictHostKeyChecking=no \
+              -o UserKnownHostsFile=/dev/null \
+              ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
+            # Go to staging folder
+            cd /home/ubuntu/Staging/stag/practice
+            
+            # Pull the latest staging code
+            git fetch origin
+            git checkout staging
+            git pull origin staging
+            
+            echo "✅ Staging code updated successfully!"
+          EOF
+      
+      - name: 🔄 Restart Staging Container
+        run: |
+          ssh -i ~/.ssh/aws_key.pem \
+              -o StrictHostKeyChecking=no \
+              -o UserKnownHostsFile=/dev/null \
+              ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
+            # Find and restart staging container
+            # Method 1: Try docker-compose
+            if [ -f /home/ubuntu/Staging/docker-compose.yml ]; then
+              cd /home/ubuntu/Staging
+              docker compose restart
+            else
+              # Method 2: Try direct docker restart
+              # Find container with 'staging' in name
+              CONTAINER=$(docker ps --filter "name=staging" --format "{{.Names}}" | head -1)
+              if [ -n "$CONTAINER" ]; then
+                echo "Restarting container: $CONTAINER"
+                docker restart $CONTAINER
+              else
+                echo "⚠️  No staging container found. Available containers:"
+                docker ps --format "table {{.Names}}\t{{.Status}}"
+              fi
+            fi
+            
+            echo "✅ Staging container restart attempted!"
+          EOF
+      
+      - name: 🎉 Deployment Complete
+        run: echo "✅ Staging deployment completed successfully!"
