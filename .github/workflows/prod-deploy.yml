@@ -69,7 +69,7 @@ jobs:
             # Find and restart production container
             if [ -f /home/ubuntu/Production/docker-compose.yml ]; then
               cd /home/ubuntu/Production
-              docker-compose restart
+              docker compose restart
             else
               # Find container with 'prod' or 'production' in name
               CONTAINER=$(docker ps --filter "name=prod" --format "{{.Names}}" | head -1)
