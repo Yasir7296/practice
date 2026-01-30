@@ -1,0 +1,96 @@
+# Deploy to Production - AWS PEM Compatible
+name: Deploy to Production Server
+
+on:
+  pull_request:
+    branches:
+      - prod
+    types:
+      - closed
+
+jobs:
+  deploy-production:
+    name: Deploy to Production
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 🚀 Starting Production Deployment
+        run: |
+          echo "🚨 DEPLOYING TO PRODUCTION 🚨"
+          echo "PR #${{ github.event.pull_request.number }} merged"
+      
+      - name: 🔑 Setup SSH Key (AWS PEM)
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/aws_key.pem
+          chmod 600 ~/.ssh/aws_key.pem
+          ssh-keyscan -H ${{ secrets.SERVER_IP }} >> ~/.ssh/known_hosts
+          
+          if [ ! -s ~/.ssh/aws_key.pem ]; then
+            echo "❌ Error: PEM key file is empty!"
+            exit 1
+          fi
+          
+          echo "✅ SSH key configured successfully"
+      
+      - name: 🔌 Test SSH Connection
+        run: |
+          echo "Testing connection to production server..."
+          ssh -i ~/.ssh/aws_key.pem \
+              -o StrictHostKeyChecking=no \
+              -o UserKnownHostsFile=/dev/null \
+              ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} \
+              "echo '✅ SSH connection successful!'"
+      
+      - name: 📥 Pull Production Code on Server
+        run: |
+          ssh -i ~/.ssh/aws_key.pem \
+              -o StrictHostKeyChecking=no \
+              -o UserKnownHostsFile=/dev/null \
+              ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
+            # Go to production folder
+            cd /home/ubuntu/Production/prod/practice
+            
+            # Pull the latest production code
+            git fetch origin
+            git checkout prod
+            git pull origin prod
+            
+            echo "✅ Production code updated successfully!"
+          EOF
+      
+      - name: 🔄 Restart Production Container
+        run: |
+          ssh -i ~/.ssh/aws_key.pem \
+              -o StrictHostKeyChecking=no \
+              -o UserKnownHostsFile=/dev/null \
+              ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
+            # Find and restart production container
+            if [ -f /home/ubuntu/Production/docker-compose.yml ]; then
+              cd /home/ubuntu/Production
+              docker-compose restart
+            else
+              # Find container with 'prod' or 'production' in name
+              CONTAINER=$(docker ps --filter "name=prod" --format "{{.Names}}" | head -1)
+              if [ -z "$CONTAINER" ]; then
+                CONTAINER=$(docker ps --filter "name=production" --format "{{.Names}}" | head -1)
+              fi
+              
+              if [ -n "$CONTAINER" ]; then
+                echo "Restarting container: $CONTAINER"
+                docker restart $CONTAINER
+              else
+                echo "⚠️  No production container found. Available containers:"
+                docker ps --format "table {{.Names}}\t{{.Status}}"
+              fi
+            fi
+            
+            echo "✅ Production container restart attempted!"
+          EOF
+      
+      - name: 🎉 Success
+        run: |
+          echo "================================================"
+          echo "✅ PRODUCTION DEPLOYED SUCCESSFULLY!"
+          echo "================================================"
