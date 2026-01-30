@@ -14,4 +14,4 @@ def uninstall_hook(env):
     :param env: Odoo environment passed during module uninstall
     """
     reset_payment_provider(env, "revolut")
-sdfjalkfjalkfja;ljf;lakj
+this is a testing code 
